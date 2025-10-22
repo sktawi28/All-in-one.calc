@@ -1,0 +1,1032 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>آلة حاسبة ومحول عملات</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts: Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap" rel="stylesheet">
+    <!-- Font Awesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+    <style>
+        /* Custom styles for the app */
+        body {
+            font-family: 'Inter', sans-serif;
+            -webkit-tap-highlight-color: transparent; /* Disable tap highlight on mobile */
+        }
+        /* Style for active button */
+        .btn-active {
+            background-color: #4f46e5 !important; /* Indigo 600 */
+            color: white !important;
+        }
+        /* Custom scrollbar for display and history */
+        .custom-scrollbar::-webkit-scrollbar {
+            height: 4px;
+            width: 4px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: #4a5568;
+            border-radius: 2px;
+        }
+        .custom-scrollbar {
+            scrollbar-width: thin;
+            scrollbar-color: #4a5568 transparent;
+        }
+        input[type="number"]::-webkit-inner-spin-button,
+        input[type="number"]::-webkit-outer-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+        input[type="number"] {
+            -moz-appearance: textfield;
+        }
+        .time-period-btn {
+            transition: background-color 0.2s, color 0.2s;
+        }
+        .time-period-active {
+            background-color: #4f46e5 !important; /* Indigo 600 */
+            color: white !important;
+        }
+        #voice-input-btn.listening {
+            color: #ef4444; /* red-500 */
+            animation: pulse 1.5s infinite;
+        }
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.2); }
+            100% { transform: scale(1); }
+        }
+
+       /* New BB-8 Theme Toggle Styles */
+        .switch-container {
+            transform: scale(0.4) translateY(-20px);
+        }
+        .switch { --toggle-size: 1; }
+        .switch *, .switch *::after, *::before { box-sizing: border-box; }
+        .switch { box-sizing: border-box; display: inline-flex; align-items: center; width: 170px; height: 90px; background-color: #b7cecc; position: relative; border-radius: 999px; transition: .4s; cursor: pointer; transform: scale(var(--toggle-size)); }
+        .moons { position: absolute; width: 100px; height: 65px; overflow: hidden; top: 0; left: -10px; }
+        .moons .star { position: absolute; width: 1px; height: 1px; top: 45px; left: 30px; border-radius: 999px; background-color: #ffffff; }
+        .moons .star.star-1 { top: 100%; left: 75px; transition: .2s; }
+        .moons .star.star-2 { top: 100%; left: 65px; transition: .3s; }
+        .moons .star.star-3 { top: 100%; left: 85px; transition: .4s; }
+        .moons .star.star-4 { top: 100%; left: 60px; transition: .5s; }
+        .moons .star.star-5 { top: 100%; left: 44px; transition: .6s; }
+        .moons .first-moon { position: absolute; transition: .4s; width: 30px; height: 30px; top: 100%; left: 30px; background-color: #e0d6d6; border-radius: 999px; }
+        .moons::before, .moons::after { transition: .6s; content: ""; position: absolute; width: 8px; height: 8px; background-color: #dde4e6; border-radius: 999px; top: 100%; left: 70px; }
+        .moons::after { width: 5px; height: 5px; left: 81px; transition: .8s; }
+        .sand { position: absolute; width: 100%; height: 45px; bottom: 0px; left: 0; border-radius: 0 0 999px 999px; overflow: hidden; }
+        .suns { position: absolute; border-radius: 1in; width: 40px; height: 40px; top: 10px; right: 30px; box-shadow: 0 0 15px #EAB308; background-color: #EAB308; transition: .6s; }
+        .sand::before { position: absolute; width: 100%; height: 25px; bottom: 0px; left: 0; content: ""; background-color: #B69C77; border-radius: 0 0 999px 999px; }
+        .bb8 { position: absolute; left: -18%; width: 140px; transform: scale(0.45); transition: left .4s; }
+        .slider { display: none; }
+        .antennas { position: absolute; transition: all 0.4s; left: 28%; }
+        .antenna { background: #e0d2be; position: absolute; width: 2px; }
+        .antenna.short { height: 20px; top: -65px; left: 50px; }
+        .antenna.long { border-top: 6px solid #020204; border-bottom: 6px solid #020204; height: 36px; top: -80px; left: 56px; }
+        .head { transition: transform .4s; background-color: ghostwhite; border-radius: 90px 90px 25px 25px; height: 63px; margin-left: -45px; overflow: hidden; position: absolute; width: 95px; z-index: 1; top: -56px; left: 56%; }
+        .head .stripe { position: absolute; width: 100%; }
+        .head .stripe.one { background: #7699B7; height: 7px; opacity: 0.8; z-index: 1; top: 3px; }
+        .head .stripe.two { background: #CD7640; height: 4px; top: 14px; }
+        .head .stripe.three { background: #999; height: 4px; opacity: 0.5; bottom: 3px; }
+        .head .stripe.detail { display: flex; width: 200px; bottom: 7px; left: -38%; transition: left 0.4s; }
+        .head .detail { height: 7px; }
+        .head .detail.zero { background-color: #CD7640; width: 2%; margin-left: 3px; }
+        .head .detail.one { background-color: #CD7640; width: 8%; margin-left: 3px; }
+        .head .detail.two { background-color: #CD7640; width: 6%; margin-left: 5px; }
+        .head .detail.three { background-color: #CD7640; width: 4%; margin-left: 45px; height: 5px; margin-top: 2px; }
+        .head .detail.four { background-color: #CD7640; width: 10%; margin-left: 4px; }
+        .head .detail.five { background-color: #CD7640; width: 2%; margin-left: 3px; }
+        .head .eyes { display: inline-block; height: 100%; position: absolute; width: 100%; transition: left 0.4s; left: 22%; }
+        .head .eye { border-radius: 50%; display: block; position: absolute; }
+        .head .eye.one { background: #020204; border: 4px solid lightgray; height: 30px; width: 30px; top: 12px; left: 12%; }
+        .head .eye.one:after { background: white; border-radius: 50%; content: ""; display: block; height: 3px; position: absolute; width: 3px; top: 4px; right: 4px; }
+        .head .eye.two { background-color: lightgrey; border: 1px solid #020204; height: 16px; width: 16px; top: 30px; left: 40%; }
+        .head .eye.two:after { background: #020204; border-radius: 50%; content: ""; display: block; height: 10px; position: absolute; width: 10px; top: 2px; left: 2px; }
+        .ball { background-color: ghostwhite; border-radius: 50%; height: 165px; overflow: hidden; position: relative; width: 165px; transition: transform .4s; }
+        .lines { border: 2px solid #B19669; border-radius: 50%; height: 400px; opacity: 0.6; position: absolute; width: 400px; }
+        .lines.two { top: -10px; left: -250px; }
+        .ring { background: #CD7640; border-radius: 50%; height: 70px; margin-left: -35px; position: absolute; width: 70px; }
+        .ring:after { background-color: ghostwhite; border-radius: 50%; content: ""; display: block; height: 73%; margin-top: -36%; margin-left: -36%; position: absolute; width: 73%; top: 50%; left: 50%; }
+        .ring.one { margin-left: -40px; height: 90px; width: 100px; top: 2%; left: 42%; }
+        .ring.two { height: 40px; width: 80px; transform: rotate(50deg); top: 65%; left: 8%; }
+        .ring.two:after { top: 100%; }
+        .ring.three { height: 37px; width: 80px; transform: rotate(-50deg); top: 68%; left: 84%; }
+        .ring.three:after { top: 110%; }
+        .shadow { background: #3A271C; box-shadow: 5px 0 50px #3A271C; border-radius: 50%; height: 23.3333333333px; opacity: 0.25; position: absolute; width: 110px; left: 28px; z-index: -1; bottom: -8px; }
+        .slider:checked+ .switch .bb8 { left: 29%; }
+        .slider:checked + .switch .bb8 .ball { transform: rotate(180deg); }
+        .slider:hover+ .switch .bb8 .eyes { left: 60%; }
+        .slider:checked:hover+ .switch .bb8 .eyes { left: -20%; }
+        .slider:active+ .switch .bb8 .head { transform: translate(30px, 3px) rotateZ(17deg); }
+        .slider:checked:active+ .switch .bb8 .head { transform: translate(-35px, 6px) rotateZ(-17deg); }
+        .slider:active+.switch .antennas { transform: translate(35px, -20px) rotateZ(17deg); }
+        .slider:active:not(:hover)+.switch .antennas { transform: translate(35px, -10px) rotateZ(17deg); }
+        .slider:checked:active+.switch .antennas { transform: translate(-35px, 15px) rotateZ(-17deg); }
+        .slider:checked:active:not(:hover)+.switch .antennas { transform: translate(-25px, 25px) rotateZ(-17deg); }
+        .slider:hover+ .switch .antennas, .slider:checked+ .switch .antennas { left: 6%; }
+        .slider:hover+ .switch .stripe.detail, .slider:checked+ .switch .stripe.detail { left: 0; }
+        .slider:checked:hover+ .switch .antennas { left: 28%; }
+        .slider:checked:hover+ .switch .stripe.detail { left: -38%; }
+        .slider:checked + .switch { background-color: #112350; }
+        .slider:checked + .switch .suns { top: 50px; }
+        .slider:checked + .switch .moons .first-moon { top: 15px; box-shadow: 0 0 10px #B8CCCD; }
+        .slider:checked + .switch .moons::after { top: 38px; box-shadow: 0 0 15px #B8CCCD; }
+        .slider:checked + .switch .moons::before { top: 34px; box-shadow: 0 0 15px #B8CCCD; }
+        .slider:checked + .switch .moons .star { box-shadow: 0 0 20px 2px #fff; }
+        .slider:checked + .switch .moons .star.star-1 { top: 20px; }
+        .slider:checked + .switch .moons .star.star-2 { top: 15px; }
+        .slider:checked + .switch .moons .star.star-3 { top: 15px; }
+        .slider:checked + .switch .moons .star.star-4 { top: 45px; }
+        .slider:checked + .switch .moons .star.star-5 { top: 53px; }
+
+        /* Splash Screen */
+        #splash-screen {
+            background: linear-gradient(135deg, #0a192f 0%, #172a45 50%, #303c55 100%);
+            z-index: 100;
+            transition: opacity 1s ease-out, visibility 1s ease-out;
+        }
+        #splash-screen.hidden {
+            opacity: 0;
+            visibility: hidden;
+        }
+        #splash-logo {
+            animation: float 3s ease-in-out infinite, fadeIn 2s ease-out;
+        }
+        #splash-text {
+            animation: slideInUp 1.5s ease-out;
+        }
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-15px); }
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: scale(0.8); }
+            to { opacity: 1; transform: scale(1); }
+        }
+        @keyframes slideInUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+    </style>
+    <script>
+        // Tailwind dark mode configuration
+        tailwind.config = {
+            darkMode: 'class',
+        }
+    </script>
+</head>
+<body class="bg-gray-100 dark:bg-gray-900 flex items-center justify-center min-h-screen transition-colors duration-300 py-8">
+
+    <!-- Splash Screen -->
+    <div id="splash-screen" class="fixed inset-0 flex flex-col items-center justify-center">
+        <img src="App.logo.jpg" src="https://storage.googleapis.com/gemini-prod/images/App.logo.jpg" alt="App Logo" class="w-48 h-48 mb-4 rounded-3xl">
+        <h1 id="splash-text" class="text-3xl font-bold text-white tracking-wider">All-in-one calc</h1>
+    </div>
+
+    <div id="main-content" class="w-full max-w-sm mx-auto bg-white dark:bg-gray-800 shadow-2xl rounded-3xl p-6 space-y-6 opacity-0 transition-opacity duration-500">
+        
+        <!-- Header: Title and Theme Toggle -->
+        <header class="flex justify-between items-center">
+            <h1 data-i18n-key="appTitle" class="text-xl font-bold text-gray-800 dark:text-white">حاسبتي</h1>
+            
+            <!-- New BB-8 Theme toggle -->
+            <div class="switch-container">
+                <label>
+                    <input id="switch" class="slider" type="checkbox" />
+                    <div class="switch">
+                        <div class="suns"></div>
+                        <div class="moons">
+                            <div class="star star-1"></div>
+                            <div class="star star-2"></div>
+                            <div class="star star-3"></div>
+                            <div class="star star-4"></div>
+                            <div class="star star-5"></div>
+                            <div class="first-moon"></div>
+                        </div>
+                        <div class="sand"></div>
+                        <div class="bb8">
+                            <div class="antennas">
+                                <div class="antenna short"></div>
+                                <div class="antenna long"></div>
+                            </div>
+                            <div class="head">
+                                <div class="stripe one"></div>
+                                <div class="stripe two"></div>
+                                <div class="eyes">
+                                    <div class="eye one"></div>
+                                    <div class="eye two"></div>
+                                </div>
+                                <div class="stripe detail">
+                                    <div class="detail zero"></div>
+                                    <div class="detail zero"></div>
+                                    <div class="detail one"></div>
+                                    <div class="detail two"></div>
+                                    <div class="detail three"></div>
+                                    <div class="detail four"></div>
+                                    <div class="detail five"></div>
+                                    <div class="detail five"></div>
+                                </div>
+                                <div class="stripe three"></div>
+                            </div>
+                            <div class="ball">
+                                <div class="lines one"></div>
+                                <div class="lines two"></div>
+                                <div class="ring one"></div>
+                                <div class="ring two"></div>
+                                <div class="ring three"></div>
+                            </div>
+                            <div class="shadow"></div>
+                        </div>
+                    </div>
+                </label>
+            </div>
+             <button id="lang-switch-btn" class="text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg text-sm p-2.5 font-bold w-14 h-14">EN</button>
+        </header>
+
+        <!-- Mode Switcher -->
+        <div class="flex bg-gray-200 dark:bg-gray-700 rounded-full p-1 text-xs sm:text-sm">
+            <button id="finance-btn" data-i18n-key="finance" class="w-1/5 py-2 font-semibold text-gray-700 dark:text-gray-300 rounded-full transition-colors duration-300">مالية</button>
+            <button id="unit-converter-btn" data-i18n-key="units" class="w-1/5 py-2 font-semibold text-gray-700 dark:text-gray-300 rounded-full transition-colors duration-300">وحدات</button>
+            <button id="age-btn" data-i18n-key="age" class="w-1/5 py-2 font-semibold text-gray-700 dark:text-gray-300 rounded-full transition-colors duration-300">العمر</button>
+            <button id="converter-btn" data-i18n-key="currency" class="w-1/5 py-2 font-semibold text-gray-700 dark:text-gray-300 rounded-full transition-colors duration-300">عملات</button>
+            <button id="calc-btn" data-i18n-key="calculator" class="w-1/5 py-2 font-semibold rounded-full transition-colors duration-300 btn-active">حاسبة</button>
+        </div>
+
+        <!-- Calculator View -->
+        <div id="calculator-view">
+            <!-- Display -->
+            <div dir="ltr" class="relative bg-gray-100 dark:bg-gray-700 rounded-xl p-4 mb-4 text-right overflow-x-auto custom-scrollbar">
+                <button id="voice-input-btn" class="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500 dark:text-gray-400 hover:text-indigo-500 text-xl transition-colors">
+                    <i class="fas fa-microphone"></i>
+                </button>
+                <div id="history" class="text-gray-500 dark:text-gray-400 text-sm h-6">&nbsp;</div>
+                <div id="display" class="text-4xl font-bold text-gray-800 dark:text-white break-all">0</div>
+            </div>
+
+            <!-- Buttons Grid -->
+            <div class="grid grid-cols-4 gap-3 text-lg" dir="ltr">
+                 <button data-key="clear" class="btn bg-indigo-200 dark:bg-indigo-800 text-indigo-600 dark:text-indigo-200 font-bold">AC</button>
+                <button data-key="paren" class="btn bg-gray-200 dark:bg-gray-600 text-gray-800 dark:text-gray-200">(</button>
+                <button data-key="paren" class="btn bg-gray-200 dark:bg-gray-600 text-gray-800 dark:text-gray-200">)</button>
+                <button data-key="percent" class="btn bg-gray-200 dark:bg-gray-600 text-gray-800 dark:text-gray-200">%</button>
+                <button data-key="7" class="btn-num">7</button>
+                <button data-key="8" class="btn-num">8</button>
+                <button data-key="9" class="btn-num">9</button>
+                <button data-key="operator" class="btn bg-orange-400 dark:bg-orange-600 text-white font-bold text-xl">÷</button>
+                <button data-key="4" class="btn-num">4</button>
+                <button data-key="5" class="btn-num">5</button>
+                <button data-key="6" class="btn-num">6</button>
+                <button data-key="operator" class="btn bg-orange-400 dark:bg-orange-600 text-white font-bold text-xl">×</button>
+                <button data-key="1" class="btn-num">1</button>
+                <button data-key="2" class="btn-num">2</button>
+                <button data-key="3" class="btn-num">3</button>
+                <button data-key="operator" class="btn bg-orange-400 dark:bg-orange-600 text-white font-bold text-xl">−</button>
+                <button data-key="0" class="btn-num col-span-2">0</button>
+                <button data-key="." class="btn-num">.</button>
+                <button data-key="operator" class="btn bg-orange-400 dark:bg-orange-600 text-white font-bold text-xl">+</button>
+                <button data-key="equals" class="btn bg-indigo-500 dark:bg-indigo-600 text-white font-bold col-span-4 text-xl mt-3">=</button>
+            </div>
+            
+            <!-- Calculation History -->
+            <div id="history-view" class="mt-4 border-t border-gray-200 dark:border-gray-700 pt-4">
+                <div class="flex justify-between items-center mb-2">
+                    <h2 data-i18n-key="historyTitle" class="text-sm font-semibold text-gray-600 dark:text-gray-400">سجل العمليات</h2>
+                    <button id="clear-history" data-i18n-key="clearHistory" class="text-xs text-indigo-500 hover:text-indigo-700 dark:hover:text-indigo-400 font-semibold">مسح الكل</button>
+                </div>
+                <div id="history-list" class="space-y-2 max-h-[120px] overflow-y-auto custom-scrollbar pr-2"></div>
+            </div>
+        </div>
+
+        <!-- Currency Converter View -->
+        <div id="converter-view" class="hidden">
+            <div class="space-y-4">
+                <!-- From Currency -->
+                <div class="bg-gray-100 dark:bg-gray-700 p-4 rounded-xl">
+                    <div class="flex justify-between items-center">
+                        <input type="number" id="from-amount" value="1" class="bg-transparent text-2xl font-bold text-gray-800 dark:text-white w-full outline-none" dir="ltr">
+                        <select id="from-currency" class="bg-gray-200 dark:bg-gray-600 text-gray-800 dark:text-white rounded-lg p-2 border-0 outline-none"></select>
+                    </div>
+                </div>
+                <!-- Swap Button -->
+                <div class="flex justify-center items-center">
+                    <div class="w-full h-px bg-gray-200 dark:bg-gray-600"></div>
+                    <button id="swap-currency" class="mx-4 p-2 rounded-full bg-gray-200 dark:bg-gray-600 text-gray-600 dark:text-gray-300">
+                        <i class="fas fa-exchange-alt"></i>
+                    </button>
+                    <div class="w-full h-px bg-gray-200 dark:bg-gray-600"></div>
+                </div>
+                <!-- To Currency -->
+                 <div class="bg-gray-100 dark:bg-gray-700 p-4 rounded-xl">
+                    <div class="flex justify-between items-center">
+                        <div id="to-amount" class="text-2xl font-bold text-gray-800 dark:text-white w-full" dir="ltr">...</div>
+                        <select id="to-currency" class="bg-gray-200 dark:bg-gray-600 text-gray-800 dark:text-white rounded-lg p-2 border-0 outline-none"></select>
+                    </div>
+                </div>
+                 <div id="rate-info" data-i18n-key-prefix="rateInfo" class="text-center text-xs text-gray-500 dark:text-gray-400 pt-2">
+                    أسعار الصرف هي قيم تقريبية.
+                </div>
+            </div>
+        </div>
+
+        <!-- Age Calculator View -->
+        <div id="age-calculator-view" class="hidden">
+            <div class="space-y-4">
+                <h2 data-i18n-key="ageTitle" class="text-center font-bold text-lg text-gray-800 dark:text-white">أدخل تاريخ ميلادك</h2>
+                
+                 <!-- Error Message Area -->
+                <div id="age-error" class="text-red-500 text-xs text-center h-4 transition-opacity duration-300"></div>
+
+                <!-- Date Inputs -->
+                <div class="flex items-center space-x-2" dir="ltr">
+                    <input type="number" id="age-day" data-i18n-placeholder="dayPlaceholder" placeholder="DD" class="w-1/3 bg-gray-100 dark:bg-gray-700 text-center font-bold text-lg p-3 rounded-lg outline-none focus:ring-2 focus:ring-indigo-400">
+                    <input type="number" id="age-month" data-i18n-placeholder="monthPlaceholder" placeholder="MM" class="w-1/3 bg-gray-100 dark:bg-gray-700 text-center font-bold text-lg p-3 rounded-lg outline-none focus:ring-2 focus:ring-indigo-400">
+                    <input type="number" id="age-year" data-i18n-placeholder="yearPlaceholder" placeholder="YYYY" class="w-1/3 bg-gray-100 dark:bg-gray-700 text-center font-bold text-lg p-3 rounded-lg outline-none focus:ring-2 focus:ring-indigo-400">
+                </div>
+                
+                <!-- Time Inputs (Optional) -->
+                <div data-i18n-key="timeOptional" class="text-center text-xs text-gray-400 dark:text-gray-500 -mt-2">الوقت (اختياري)</div>
+                 <div class="flex items-center space-x-2" dir="ltr">
+                    <input type="number" id="age-hour" data-i18n-placeholder="hourPlaceholder" placeholder="الساعة" class="w-1/3 bg-gray-100 dark:bg-gray-700 text-center font-bold text-lg p-3 rounded-lg outline-none focus:ring-2 focus:ring-indigo-400">
+                    <input type="number" id="age-minute" data-i18n-placeholder="minutePlaceholder" placeholder="الدقيقة" class="w-1/3 bg-gray-100 dark:bg-gray-700 text-center font-bold text-lg p-3 rounded-lg outline-none focus:ring-2 focus:ring-indigo-400">
+                    <div class="w-1/3 flex bg-gray-200 dark:bg-gray-600 rounded-lg text-sm">
+                        <button type="button" id="age-am" data-i18n-key="am" class="w-1/2 py-3 font-semibold rounded-lg text-xs time-period-btn time-period-active">ص</button>
+                        <button type="button" id="age-pm" data-i18n-key="pm" class="w-1/2 py-3 font-semibold rounded-lg text-xs time-period-btn">م</button>
+                    </div>
+                </div>
+
+                <!-- Calendar Type -->
+                <div class="flex items-center justify-center space-x-4">
+                    <label class="flex items-center space-x-2 text-gray-700 dark:text-gray-300 cursor-pointer">
+                        <input type="radio" name="calendar" value="gregorian" checked class="form-radio text-indigo-500 focus:ring-indigo-400">
+                        <span data-i18n-key="gregorian">ميلادي</span>
+                    </label>
+                    <label class="flex items-center space-x-2 text-gray-700 dark:text-gray-300 cursor-pointer">
+                        <input type="radio" name="calendar" value="hijri" class="form-radio text-indigo-500 focus:ring-indigo-400">
+                        <span data-i18n-key="hijri">هجري</span>
+                    </label>
+                </div>
+
+                <!-- Results -->
+                <div id="age-results" class="pt-4 border-t border-gray-200 dark:border-gray-700 text-center space-y-2 opacity-0 transition-opacity duration-500">
+                    <div id="calculated-age" class="text-lg font-semibold text-gray-800 dark:text-white"></div>
+                    <div id="converted-date" class="text-sm text-gray-500 dark:text-gray-400"></div>
+                    <div data-i18n-key="hijriNote" class="text-xs text-gray-400 dark:text-gray-500 pt-2">
+                        * التحويل الهجري هو تحويل حسابي وقد يختلف عن الرؤية الفعلية.
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Unit Converter View -->
+        <div id="unit-converter-view" class="hidden">
+            <div class="space-y-4">
+                 <!-- Measurement Type -->
+                <select id="measurement-type" class="w-full bg-gray-200 dark:bg-gray-600 text-gray-800 dark:text-white rounded-lg p-3 border-0 outline-none font-semibold">
+                    <option value="length" data-i18n-key="length">الطول</option>
+                    <option value="weight" data-i18n-key="weight">الوزن</option>
+                    <option value="temperature" data-i18n-key="temperature">درجة الحرارة</option>
+                    <option value="bmi" data-i18n-key="bmi">كتلة الجسم</option>
+                </select>
+                
+                <div id="standard-unit-converter">
+                    <!-- From Unit -->
+                    <div class="bg-gray-100 dark:bg-gray-700 p-4 rounded-xl">
+                        <div class="flex justify-between items-center">
+                            <input type="number" id="from-unit-amount" value="1" class="bg-transparent text-2xl font-bold text-gray-800 dark:text-white w-full outline-none" dir="ltr">
+                            <select id="from-unit-select" class="bg-gray-200 dark:bg-gray-600 text-gray-800 dark:text-white rounded-lg p-2 border-0 outline-none"></select>
+                        </div>
+                    </div>
+                    <!-- Swap Button -->
+                    <div class="flex justify-center items-center">
+                        <div class="w-full h-px bg-gray-200 dark:bg-gray-600"></div>
+                        <button id="swap-units" class="mx-4 p-2 rounded-full bg-gray-200 dark:bg-gray-600 text-gray-600 dark:text-gray-300">
+                            <i class="fas fa-exchange-alt"></i>
+                        </button>
+                        <div class="w-full h-px bg-gray-200 dark:bg-gray-600"></div>
+                    </div>
+                    <!-- To Unit -->
+                    <div class="bg-gray-100 dark:bg-gray-700 p-4 rounded-xl">
+                        <div class="flex justify-between items-center">
+                            <div id="to-unit-amount" class="text-2xl font-bold text-gray-800 dark:text-white w-full" dir="ltr">...</div>
+                            <select id="to-unit-select" class="bg-gray-200 dark:bg-gray-600 text-gray-800 dark:text-white rounded-lg p-2 border-0 outline-none"></select>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="bmi-converter" class="hidden space-y-4">
+                     <h2 data-i18n-key="bmiTitle" class="text-center font-bold text-lg text-gray-800 dark:text-white">حاسبة كتلة الجسم</h2>
+                     <div class="bg-gray-100 dark:bg-gray-700 p-4 rounded-xl space-y-3">
+                        <div>
+                            <label data-i18n-key="weightKg" class="text-xs text-gray-500 dark:text-gray-400">الوزن (كجم)</label>
+                            <input type="number" id="bmi-weight" data-i18n-placeholder="weightKg" placeholder="70" class="bg-transparent text-xl font-bold text-gray-800 dark:text-white w-full outline-none" dir="ltr">
+                        </div>
+                         <div>
+                            <label data-i18n-key="heightCm" class="text-xs text-gray-500 dark:text-gray-400">الطول (سم)</label>
+                            <input type="number" id="bmi-height" data-i18n-placeholder="heightCm" placeholder="175" class="bg-transparent text-xl font-bold text-gray-800 dark:text-white w-full outline-none" dir="ltr">
+                        </div>
+                    </div>
+                     <div id="bmi-results" class="text-center bg-gray-100 dark:bg-gray-700 p-4 rounded-xl space-y-1">
+                        <span data-i18n-key="yourBmiIs" class="text-sm text-gray-500 dark:text-gray-400">مؤشر كتلة الجسم</span>
+                        <div class="flex items-center justify-center space-x-2">
+                             <span id="bmi-result-value" class="font-bold text-2xl text-indigo-500 dark:text-indigo-400" dir="ltr">0</span>
+                             <span id="bmi-result-category" class="font-semibold text-sm text-gray-700 dark:text-gray-300"></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Financial Management View -->
+        <div id="finance-view" class="hidden">
+            <div class="space-y-6">
+                <!-- Loan Calculator -->
+                <div class="space-y-4">
+                    <h2 data-i18n-key="loanTitle" class="text-center font-bold text-lg text-gray-800 dark:text-white">حاسبة القروض</h2>
+                    
+                    <div class="flex items-center justify-center space-x-4">
+                        <label class="flex items-center space-x-2 text-gray-700 dark:text-gray-300 cursor-pointer">
+                            <input type="radio" name="user-type" value="employee" checked class="form-radio text-indigo-500 focus:ring-indigo-400">
+                            <span data-i18n-key="employee">موظف</span>
+                        </label>
+                        <label class="flex items-center space-x-2 text-gray-700 dark:text-gray-300 cursor-pointer">
+                            <input type="radio" name="user-type" value="retired" class="form-radio text-indigo-500 focus:ring-indigo-400">
+                            <span data-i18n-key="retired">متقاعد</span>
+                        </label>
+                    </div>
+
+                    <div class="bg-gray-100 dark:bg-gray-700 p-4 rounded-xl space-y-3">
+                        <div>
+                            <label data-i18n-key="salary" class="text-xs text-gray-500 dark:text-gray-400">الراتب الشهري</label>
+                            <input type="number" id="loan-salary" placeholder="10000" class="bg-transparent text-xl font-bold text-gray-800 dark:text-white w-full outline-none" dir="ltr">
+                        </div>
+                        <div>
+                            <label data-i18n-key="commitments" class="text-xs text-gray-500 dark:text-gray-400">الالتزامات الشهرية</label>
+                            <input type="number" id="loan-commitments" placeholder="2000" class="bg-transparent text-xl font-bold text-gray-800 dark:text-white w-full outline-none" dir="ltr">
+                        </div>
+                        <div>
+                            <label data-i18n-key="loanAmount" class="text-xs text-gray-500 dark:text-gray-400">مبلغ القرض</label>
+                            <input type="number" id="loan-amount" placeholder="50000" class="bg-transparent text-xl font-bold text-gray-800 dark:text-white w-full outline-none" dir="ltr">
+                        </div>
+                        <div>
+                             <label data-i18n-key="loanDuration" class="text-xs text-gray-500 dark:text-gray-400">مدة القرض</label>
+                             <div class="flex items-center">
+                                <input type="number" id="loan-duration" placeholder="5" class="bg-transparent text-xl font-bold text-gray-800 dark:text-white w-full outline-none" dir="ltr">
+                                <select id="loan-duration-unit" class="bg-gray-200 dark:bg-gray-600 text-gray-800 dark:text-white rounded-lg p-1 border-0 outline-none text-sm">
+                                    <option value="years" data-i18n-key="years">سنوات</option>
+                                    <option value="months" data-i18n-key="months">أشهر</option>
+                                </select>
+                             </div>
+                        </div>
+                        <div>
+                            <label data-i18n-key="loanInterest" class="text-xs text-gray-500 dark:text-gray-400">نسبة الفائدة السنوية (%)</label>
+                            <input type="number" id="loan-interest" placeholder="4.5" class="bg-transparent text-xl font-bold text-gray-800 dark:text-white w-full outline-none" dir="ltr">
+                        </div>
+                    </div>
+
+                    <div id="loan-approval-results" class="text-center bg-gray-100 dark:bg-gray-700 p-4 rounded-xl space-y-2">
+                        <div class="flex justify-between items-center">
+                            <span data-i18n-key="monthlyPayment" class="text-sm text-gray-500 dark:text-gray-400">القسط الشهري</span>
+                            <span id="monthly-payment" class="font-bold text-lg text-indigo-500 dark:text-indigo-400" dir="ltr">0</span>
+                        </div>
+                        <div class="flex justify-between items-center">
+                            <span data-i18n-key="totalInterest" class="text-sm text-gray-500 dark:text-gray-400">مبلغ الفائدة</span>
+                            <span id="total-interest" class="font-bold text-lg text-gray-800 dark:text-white" dir="ltr">0</span>
+                        </div>
+                         <div class="flex justify-between items-center">
+                            <span data-i18n-key="totalPayment" class="text-sm text-gray-500 dark:text-gray-400">إجمالي المبلغ</span>
+                            <span id="total-payment" class="font-bold text-lg text-gray-800 dark:text-white" dir="ltr">0</span>
+                        </div>
+                    </div>
+                     <div id="loan-rejection-message" class="hidden text-center bg-red-100 dark:bg-red-900/50 p-4 rounded-xl text-red-600 dark:text-red-400 font-semibold" data-i18n-key="rejectionMessage">
+                        عذراً، مبلغ القسط يتجاوز النسبة المسموح بها من راتبك.
+                    </div>
+                </div>
+
+                <div class="w-full h-px bg-gray-200 dark:bg-gray-700"></div>
+
+                <!-- Tax Calculator -->
+                <div class="space-y-4">
+                    <h2 data-i18n-key="taxTitle" class="text-center font-bold text-lg text-gray-800 dark:text-white">حاسبة الضرائب</h2>
+                    <div class="bg-gray-100 dark:bg-gray-700 p-4 rounded-xl space-y-3">
+                        <div>
+                            <label data-i18n-key="preTaxAmount" class="text-xs text-gray-500 dark:text-gray-400">المبلغ (بدون ضريبة)</label>
+                            <input type="number" id="tax-amount" placeholder="1000" class="bg-transparent text-xl font-bold text-gray-800 dark:text-white w-full outline-none" dir="ltr">
+                        </div>
+                        <div>
+                             <label data-i18n-key="taxRate" class="text-xs text-gray-500 dark:text-gray-400">نسبة الضريبة (%)</label>
+                             <input type="number" id="tax-rate" data-i18n-placeholder="taxRatePlaceholder" placeholder="%" class="bg-transparent text-xl font-bold text-gray-800 dark:text-white w-full outline-none" dir="ltr">
+                        </div>
+                    </div>
+                     <div id="tax-results" class="text-center bg-gray-100 dark:bg-gray-700 p-4 rounded-xl space-y-2">
+                        <div class="flex justify-between items-center">
+                            <span data-i18n-key="taxValue" class="text-sm text-gray-500 dark:text-gray-400">مبلغ الضريبة</span>
+                            <span id="tax-value" class="font-bold text-lg text-indigo-500 dark:text-indigo-400" dir="ltr">0</span>
+                        </div>
+                         <div class="flex justify-between items-center">
+                            <span data-i18n-key="totalWithTax" class="text-sm text-gray-500 dark:text-gray-400">الإجمالي مع الضريبة</span>
+                            <span id="total-with-tax" class="font-bold text-lg text-gray-800 dark:text-white" dir="ltr">0</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- History Reuse Modal -->
+    <div id="history-modal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50 hidden">
+        <div class="bg-white dark:bg-gray-800 rounded-2xl p-6 w-full max-w-xs text-center space-y-4 shadow-lg">
+            <h3 data-i18n-key="reuseModalTitle" class="font-bold text-lg text-gray-800 dark:text-white">إعادة استخدام العملية</h3>
+            <p id="modal-expression" class="text-sm text-gray-500 dark:text-gray-400 bg-gray-100 dark:bg-gray-700 p-2 rounded-lg"></p>
+            <div class="flex space-x-2" dir="ltr">
+                <button id="modal-use-result" data-i18n-key="useResult" class="w-full py-2 px-4 bg-indigo-500 text-white rounded-lg font-semibold">استخدام النتيجة</button>
+                <button id="modal-edit-expr" data-i18n-key="editExpression" class="w-full py-2 px-4 bg-gray-200 dark:bg-gray-600 text-gray-800 dark:text-gray-200 rounded-lg font-semibold">تعديل العملية</button>
+            </div>
+            <button id="modal-cancel" data-i18n-key="cancel" class="w-full py-2 text-sm text-gray-500 dark:text-gray-400">إلغاء</button>
+        </div>
+    </div>
+
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // General Elements
+            const themeSwitch = document.getElementById('switch');
+            const langSwitchBtn = document.getElementById('lang-switch-btn');
+            const calcBtn = document.getElementById('calc-btn');
+            const converterBtn = document.getElementById('converter-btn');
+            const ageBtn = document.getElementById('age-btn');
+            const unitConverterBtn = document.getElementById('unit-converter-btn');
+            const financeBtn = document.getElementById('finance-btn');
+            const calculatorView = document.getElementById('calculator-view');
+            const converterView = document.getElementById('converter-view');
+            const ageCalculatorView = document.getElementById('age-calculator-view');
+            const unitConverterView = document.getElementById('unit-converter-view');
+            const financeView = document.getElementById('finance-view');
+
+            // --- THEME SWITCH LOGIC ---
+            if (document.documentElement.classList.contains('dark')) {
+                themeSwitch.checked = true;
+            }
+            themeSwitch.addEventListener('change', () => {
+                document.documentElement.classList.toggle('dark', themeSwitch.checked);
+            });
+
+
+            // --- MODE SWITCH LOGIC ---
+            calcBtn.addEventListener('click', () => switchMode('calculator'));
+            converterBtn.addEventListener('click', () => switchMode('converter'));
+            ageBtn.addEventListener('click', () => switchMode('age-calculator'));
+            unitConverterBtn.addEventListener('click', () => switchMode('unit-converter'));
+            financeBtn.addEventListener('click', () => switchMode('finance'));
+            
+            function switchMode(mode) {
+                const views = { calculator: calculatorView, converter: converterView, 'age-calculator': ageCalculatorView, 'unit-converter': unitConverterView, finance: financeView };
+                const btns = { calculator: calcBtn, converter: converterBtn, 'age-calculator': ageBtn, 'unit-converter': unitConverterBtn, finance: financeBtn };
+                Object.values(views).forEach(v => v.classList.add('hidden'));
+                Object.values(btns).forEach(b => b.classList.remove('btn-active'));
+                views[mode].classList.remove('hidden');
+                btns[mode].classList.add('btn-active');
+            }
+            
+            // --- CALCULATOR LOGIC ---
+            const display = document.getElementById('display');
+            const history = document.getElementById('history');
+            const buttons = document.querySelector('#calculator-view .grid');
+            const historyList = document.getElementById('history-list');
+            const clearHistoryBtn = document.getElementById('clear-history');
+            const historyModal = document.getElementById('history-modal');
+            const modalExpression = document.getElementById('modal-expression');
+            const modalUseResultBtn = document.getElementById('modal-use-result');
+            const modalEditExprBtn = document.getElementById('modal-edit-expr');
+            const modalCancelBtn = document.getElementById('modal-cancel');
+            const voiceInputBtn = document.getElementById('voice-input-btn');
+            let expression = '';
+            let calculationHistory = [];
+            let selectedHistoryItem = null;
+
+            function updateDisplays() { history.textContent = expression || ' '; calculateLiveResult(); }
+            function calculateLiveResult() { try { if (expression.trim() === '') { display.textContent = '0'; return; } let evalExpression = expression.replace(/×/g, '*').replace(/÷/g, '/').replace(/%/g, '/100*').trim(); if (['*', '/', '+', '-'].includes(evalExpression.slice(-1))) { evalExpression = evalExpression.slice(0, -1); } const result = eval(evalExpression); if (typeof result === 'number' && isFinite(result)) { display.textContent = result; } } catch (e) { /* Do nothing */ } }
+            buttons.addEventListener('click', (event) => { if (!event.target.matches('button')) return; const key = event.target.dataset.key; const value = event.target.textContent; if (key.match(/\d/) || key === 'paren' || key === 'percent') { expression += value; } else if (key === '.') { const segments = expression.split(/[+\-×÷()]/); if (!segments[segments.length - 1].includes('.')) { expression += value; } } else if (key === 'operator') { const trimmedExpression = expression.trim(); const lastChar = trimmedExpression.slice(-1); if (['+', '-', '×', '÷'].includes(lastChar)) { expression = trimmedExpression.slice(0, -1) + value; } else if (trimmedExpression !== '' && !['('].includes(lastChar)) { expression += value; } else if (value === '-') { expression += value; } } else if (key === 'clear') { expression = ''; } else if (key === 'equals') { try { let finalExpression = expression.replace(/×/g, '*').replace(/÷/g, '/').replace(/%/g, '/100'); const result = eval(finalExpression); if (typeof result !== 'number' || !isFinite(result)) { throw new Error("Invalid calculation"); } const historyEntry = { expression: expression, result: result }; calculationHistory.unshift(historyEntry); if (calculationHistory.length > 15) calculationHistory.pop(); renderHistory(); expression = String(result); history.textContent = ' '; display.textContent = result; return; } catch (error) { display.textContent = 'Error'; expression = ''; } } updateDisplays(); });
+
+            function renderHistory() {
+                historyList.innerHTML = '';
+                if (calculationHistory.length === 0) {
+                    historyList.innerHTML = `<p class="text-center text-xs text-gray-400 dark:text-gray-500">${translations[currentLang].noHistory}</p>`;
+                    return;
+                }
+                calculationHistory.forEach(item => {
+                    const historyItemDiv = document.createElement('div');
+                    historyItemDiv.className = 'flex justify-between items-center bg-gray-100 dark:bg-gray-700 p-2 rounded-lg cursor-pointer hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors';
+                    historyItemDiv.innerHTML = `<span class="text-xs text-gray-500 dark:text-gray-400">${item.expression}=</span><span class="font-semibold text-gray-800 dark:text-white">${item.result}</span>`;
+                    historyItemDiv.addEventListener('click', () => {
+                        selectedHistoryItem = item;
+                        modalExpression.textContent = `${item.expression} = ${item.result}`;
+                        historyModal.classList.remove('hidden');
+                    });
+                    historyList.appendChild(historyItemDiv);
+                });
+            }
+            clearHistoryBtn.addEventListener('click', () => { calculationHistory = []; renderHistory(); });
+            
+            function closeModal() { historyModal.classList.add('hidden'); selectedHistoryItem = null; }
+            modalUseResultBtn.addEventListener('click', () => { if (selectedHistoryItem) { expression += selectedHistoryItem.result; updateDisplays(); } closeModal(); });
+            modalEditExprBtn.addEventListener('click', () => { if (selectedHistoryItem) { expression = selectedHistoryItem.expression; updateDisplays(); } closeModal(); });
+            modalCancelBtn.addEventListener('click', closeModal);
+            historyModal.addEventListener('click', (e) => { if (e.target === historyModal) { closeModal(); } });
+
+            // --- SPEECH RECOGNITION LOGIC ---
+            const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+            let recognition;
+
+            if (SpeechRecognition) {
+                recognition = new SpeechRecognition();
+                recognition.continuous = false;
+                recognition.interimResults = false;
+                recognition.maxAlternatives = 1;
+
+                voiceInputBtn.addEventListener('click', () => {
+                    recognition.lang = currentLang === 'ar' ? 'ar-SA' : 'en-US';
+                    recognition.start();
+                });
+                
+                recognition.onstart = () => {
+                    voiceInputBtn.classList.add('listening');
+                };
+
+                recognition.onresult = (event) => {
+                    const transcript = event.results[0][0].transcript;
+                    processVoiceCommand(transcript);
+                };
+
+                recognition.onend = () => {
+                    voiceInputBtn.classList.remove('listening');
+                };
+
+                recognition.onerror = (event) => {
+                    console.error('Speech recognition error', event.error);
+                    voiceInputBtn.classList.remove('listening');
+                };
+
+            } else {
+                voiceInputBtn.style.display = 'none';
+                console.log('Speech Recognition not supported in this browser.');
+            }
+
+            function processVoiceCommand(command) {
+                let processedCommand = command.trim().toLowerCase();
+                 // Universal commands
+                if (processedCommand.includes('clear') || processedCommand.includes('مسح')) {
+                    document.querySelector('button[data-key="clear"]').click();
+                    return;
+                }
+                if (processedCommand.includes('equals') || processedCommand.includes('يساوي')) {
+                     processedCommand = processedCommand.replace(/equals|equal to|يساوي/g, '');
+                     expression += processedCommand.replace(/\s/g, '');
+                     document.querySelector('button[data-key="equals"]').click();
+                     return;
+                }
+
+                // Language-specific processing
+                if (currentLang === 'ar') {
+                    processedCommand = processedCommand.replace(/زائد/g, '+');
+                    processedCommand = processedCommand.replace(/ناقص/g, '-');
+                    processedCommand = processedCommand.replace(/في|ضرب/g, '×');
+                    processedCommand = processedCommand.replace(/على|تقسيم/g, '÷');
+                    processedCommand = processedCommand.replace(/فاصلة|نقطة/g, '.');
+                } else {
+                    processedCommand = processedCommand.replace(/plus/g, '+');
+                    processedCommand = processedCommand.replace(/minus/g, '-');
+                    processedCommand = processedCommand.replace(/times|multiply by|multiply/g, '×');
+                    processedCommand = processedCommand.replace(/divided by|divide/g, '÷');
+                    processedCommand = processedCommand.replace(/point|dot/g, '.');
+                }
+                
+                processedCommand = processedCommand.replace(/[^0-9.()+\-×÷\s]/g, '');
+                expression += processedCommand.replace(/\s/g, '');
+                updateDisplays();
+            }
+
+            // --- CURRENCY CONVERTER LOGIC ---
+            const fromAmountInput = document.getElementById('from-amount');
+            const toAmountDiv = document.getElementById('to-amount');
+            const fromCurrencySelect = document.getElementById('from-currency');
+            const toCurrencySelect = document.getElementById('to-currency');
+            const swapCurrencyBtn = document.getElementById('swap-currency');
+            const rateInfo = document.getElementById('rate-info');
+            const exchangeRates = { "USD": 1, "EUR": 0.93, "GBP": 0.79, "CAD": 1.37, "JPY": 157.4, "CNY": 7.25, "KRW": 1380.5, "SAR": 3.75, "AED": 3.67, "QAR": 3.64, "KWD": 0.31, "OMR": 0.38 };
+
+            function populateCurrencyOptions() {
+                const lang = currentLang || 'ar';
+                const names = translations[lang].currencyNames;
+                fromCurrencySelect.innerHTML = '';
+                toCurrencySelect.innerHTML = '';
+                Object.keys(exchangeRates).forEach(currency => {
+                    const option = `<option value="${currency}">${currency} - ${names[currency]}</option>`;
+                    fromCurrencySelect.innerHTML += option;
+                    toCurrencySelect.innerHTML += option;
+                });
+                fromCurrencySelect.value = 'SAR'; toCurrencySelect.value = 'USD';
+            }
+            function convertCurrency() {
+                const amount = parseFloat(fromAmountInput.value) || 0;
+                const from = fromCurrencySelect.value;
+                const to = toCurrencySelect.value;
+                const result = (amount / exchangeRates[from]) * exchangeRates[to];
+                toAmountDiv.textContent = result.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 4 });
+                const singleUnitRate = (1 / exchangeRates[from]) * exchangeRates[to];
+                rateInfo.textContent = `1 ${from} = ${singleUnitRate.toFixed(4)} ${to}. ${translations[currentLang].rateApproximation}`;
+            }
+            swapCurrencyBtn.addEventListener('click', () => { [fromCurrencySelect.value, toCurrencySelect.value] = [toCurrencySelect.value, fromCurrencySelect.value]; convertCurrency(); });
+            fromAmountInput.addEventListener('input', convertCurrency); fromCurrencySelect.addEventListener('change', convertCurrency); toCurrencySelect.addEventListener('change', convertCurrency);
+
+            // --- DATE CONVERSION & AGE CALCULATOR LOGIC ---
+            const ageDayInput = document.getElementById('age-day');
+            const ageMonthInput = document.getElementById('age-month');
+            const ageYearInput = document.getElementById('age-year');
+            const ageHourInput = document.getElementById('age-hour');
+            const ageMinuteInput = document.getElementById('age-minute');
+            const ageAmBtn = document.getElementById('age-am');
+            const agePmBtn = document.getElementById('age-pm');
+            const ageResultsDiv = document.getElementById('age-results');
+            const calculatedAgeDiv = document.getElementById('calculated-age');
+            const convertedDateDiv = document.getElementById('converted-date');
+            const ageErrorDiv = document.getElementById('age-error');
+            const calendarRadios = document.querySelectorAll('input[name="calendar"]');
+            
+            function gregorianToJulian(y, m, d) { y = +y; m = +m; d = +d; if (m < 3) { y--; m += 12; } const a = Math.floor(y / 100); const b = 2 - a + Math.floor(a / 4); return Math.floor(365.25 * (y + 4716)) + Math.floor(30.6001 * (m + 1)) + d + b - 1524.5; }
+            function julianToGregorian(jd) { const z = Math.floor(jd + 0.5); const a = Math.floor((z - 1867216.25) / 36524.25); const b = z + 1 + a - Math.floor(a / 4); const c = b + 1524; const d = Math.floor((c - 122.1) / 365.25); const e = Math.floor(365.25 * d); const f = Math.floor((c - e) / 30.6001); const day = c - e - Math.floor(30.6001 * f); let month = f - 1; if (month > 12) month -= 12; let year = d - 4716; if (month < 3) year++; return { y: year, m: month, d: Math.round(day) }; }
+            function hijriToJulian(y, m, d) { y = +y; m = +m; d = +d; return d + Math.ceil(29.5 * (m - 1)) + (y - 1) * 354 + Math.floor((3 + 11 * y) / 30) + 1948439.5; }
+            function julianToHijri(jd) { jd = Math.floor(jd) + 0.5; const y = Math.floor(((jd - 1948440) * 30 + 10646) / 10631); const m = Math.min(12, Math.ceil((jd - (29 + hijriToJulian(y, 1, 1))) / 29.5) + 1); const d = jd - hijriToJulian(y, m, 1) + 1; return { y, m, d }; }
+            
+            ageAmBtn.addEventListener('click', () => { ageAmBtn.classList.add('time-period-active'); agePmBtn.classList.remove('time-period-active'); updateAgeCalculation(); });
+            agePmBtn.addEventListener('click', () => { agePmBtn.classList.add('time-period-active'); ageAmBtn.classList.remove('time-period-active'); updateAgeCalculation(); });
+            function updateAgeCalculation() { const day = parseInt(ageDayInput.value); const month = parseInt(ageMonthInput.value); const year = parseInt(ageYearInput.value); let hour12 = parseInt(ageHourInput.value) || 0; const minute = parseInt(ageMinuteInput.value) || 0; const isPm = agePmBtn.classList.contains('time-period-active'); const timeEntered = ageHourInput.value !== '' || ageMinuteInput.value !== ''; if (!day || !month || !year || String(year).length < 4) { ageResultsDiv.classList.add('opacity-0'); return; } if ((hour12 < 0 || hour12 > 12) || (minute < 0 || minute > 59)) { ageErrorDiv.textContent = translations[currentLang].invalidTimeError; ageResultsDiv.classList.add('opacity-0'); return; } let hour24 = hour12; if (isPm && hour12 < 12) hour24 += 12; else if (!isPm && hour12 === 12) hour24 = 0; ageErrorDiv.textContent = ''; const calendarType = document.querySelector('input[name="calendar"]:checked').value; let birthDateG; let convertedDateStr = ''; try { if (calendarType === 'hijri') { const jd = hijriToJulian(year, month, day); const gDate = julianToGregorian(jd); birthDateG = new Date(gDate.y, gDate.m - 1, gDate.d, hour24, minute); convertedDateStr = `${translations[currentLang].gregorianDate}: ${gDate.d}/${gDate.m}/${gDate.y}`; } else { birthDateG = new Date(year, month - 1, day, hour24, minute); if (birthDateG.getFullYear() !== year || birthDateG.getMonth() !== month - 1 || birthDateG.getDate() !== day) { throw new Error(translations[currentLang].invalidGregorianDateError); } const jd = gregorianToJulian(year, month, day); const hDate = julianToHijri(jd); convertedDateStr = `${translations[currentLang].hijriDate}: ${hDate.d}/${hDate.m}/${hDate.y}`; } const today = new Date(); if (birthDateG > today) throw new Error(translations[currentLang].futureDateError); let ageYears = today.getFullYear() - birthDateG.getFullYear(); let ageMonths = today.getMonth() - birthDateG.getMonth(); let ageDays = today.getDate() - birthDateG.getDate(); let ageHours = today.getHours() - birthDateG.getHours(); let ageMinutes = today.getMinutes() - birthDateG.getMinutes(); if (ageMinutes < 0) { ageHours--; ageMinutes += 60; } if (ageHours < 0) { ageDays--; ageHours += 24; } if (ageDays < 0) { ageMonths--; ageDays += new Date(today.getFullYear(), today.getMonth(), 0).getDate(); } if (ageMonths < 0) { ageYears--; ageMonths += 12; } let ageString = `${translations[currentLang].yourAgeIs} ${ageYears} ${translations[currentLang].years}, ${ageMonths} ${translations[currentLang].months}, ${translations[currentLang].and} ${ageDays} ${translations[currentLang].days}`; if (timeEntered) { ageString += `, ${ageHours} ${translations[currentLang].hours}, ${translations[currentLang].and} ${ageMinutes} ${translations[currentLang].minutes}`; } calculatedAgeDiv.textContent = ageString; convertedDateDiv.textContent = convertedDateStr; ageResultsDiv.classList.remove('opacity-0'); } catch (e) { ageErrorDiv.textContent = e.message; ageResultsDiv.classList.add('opacity-0'); } }
+            [ageDayInput, ageMonthInput, ageYearInput, ageHourInput, ageMinuteInput].forEach(el => el.addEventListener('input', updateAgeCalculation));
+            calendarRadios.forEach(radio => radio.addEventListener('change', updateAgeCalculation));
+
+            // --- UNIT CONVERTER LOGIC ---
+            const measurementTypeSelect = document.getElementById('measurement-type');
+            const standardUnitConverter = document.getElementById('standard-unit-converter');
+            const bmiConverter = document.getElementById('bmi-converter');
+            const fromUnitAmountInput = document.getElementById('from-unit-amount');
+            const toUnitAmountDiv = document.getElementById('to-unit-amount');
+            const fromUnitSelect = document.getElementById('from-unit-select');
+            const toUnitSelect = document.getElementById('to-unit-select');
+            const swapUnitsBtn = document.getElementById('swap-units');
+
+            const bmiWeightInput = document.getElementById('bmi-weight');
+            const bmiHeightInput = document.getElementById('bmi-height');
+            const bmiResultValue = document.getElementById('bmi-result-value');
+            const bmiResultCategory = document.getElementById('bmi-result-category');
+
+            const unitKeys = { length: { 'meter': 'meter', 'kilometer': 'kilometer', 'centimeter': 'centimeter', 'millimeter': 'millimeter', 'mile': 'mile', 'yard': 'yard', 'foot': 'foot', 'inch': 'inch' }, weight: { 'gram': 'gram', 'kilogram': 'kilogram', 'milligram': 'milligram', 'tonne': 'tonne', 'pound': 'pound', 'ounce': 'ounce' }, temperature: { 'celsius': 'celsius', 'fahrenheit': 'fahrenheit', 'kelvin': 'kelvin' } };
+            const conversionFactors = { meter: 1, kilometer: 1000, centimeter: 0.01, millimeter: 0.001, mile: 1609.34, yard: 0.9144, foot: 0.3048, inch: 0.0254, gram: 1, kilogram: 1000, milligram: 0.001, tonne: 1000000, pound: 453.592, ounce: 28.3495 };
+            
+            function handleMeasurementTypeChange() {
+                const type = measurementTypeSelect.value;
+                if(type === 'bmi') {
+                    standardUnitConverter.classList.add('hidden');
+                    bmiConverter.classList.remove('hidden');
+                    calculateBMI();
+                } else {
+                    standardUnitConverter.classList.remove('hidden');
+                    bmiConverter.classList.add('hidden');
+                    populateUnitOptions();
+                }
+            }
+
+            function populateUnitOptions() { const type = measurementTypeSelect.value; const unitSet = unitKeys[type]; const unitNames = translations[currentLang].unitNames[type]; fromUnitSelect.innerHTML = ''; toUnitSelect.innerHTML = ''; for (const key in unitSet) { const option = `<option value="${key}">${unitNames[key]}</option>`; fromUnitSelect.innerHTML += option; toUnitSelect.innerHTML += option; } if (type === 'length') { fromUnitSelect.value = 'meter'; toUnitSelect.value = 'kilometer'; } else if (type === 'weight') { fromUnitSelect.value = 'kilogram'; toUnitSelect.value = 'pound'; } else { fromUnitSelect.value = 'celsius'; toUnitSelect.value = 'fahrenheit'; } convertUnits(); }
+            function convertUnits() { const amount = parseFloat(fromUnitAmountInput.value) || 0; const from = fromUnitSelect.value; const to = toUnitSelect.value; const type = measurementTypeSelect.value; let result = 0; if (type !== 'temperature') { const fromFactor = conversionFactors[from]; const toFactor = conversionFactors[to]; result = (amount * fromFactor) / toFactor; } else { if (from === 'celsius') { if (to === 'fahrenheit') result = (amount * 9/5) + 32; else if (to === 'kelvin') result = amount + 273.15; else result = amount; } else if (from === 'fahrenheit') { if (to === 'celsius') result = (amount - 32) * 5/9; else if (to === 'kelvin') result = (amount - 32) * 5/9 + 273.15; else result = amount; } else if (from === 'kelvin') { if (to === 'celsius') result = amount - 273.15; else if (to === 'fahrenheit') result = (amount - 273.15) * 9/5 + 32; else result = amount; } } toUnitAmountDiv.textContent = result.toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 4 }); }
+            
+            function calculateBMI() {
+                const weight = parseFloat(bmiWeightInput.value) || 0;
+                const height = parseFloat(bmiHeightInput.value) || 0;
+                
+                if (weight > 0 && height > 0) {
+                    const heightInMeters = height / 100;
+                    const bmi = weight / (heightInMeters * heightInMeters);
+                    bmiResultValue.textContent = bmi.toFixed(2);
+                    
+                    let categoryKey;
+                    if (bmi < 18.5) {
+                        categoryKey = 'underweight';
+                    } else if (bmi < 25) {
+                        categoryKey = 'normalWeight';
+                    } else if (bmi < 30) {
+                        categoryKey = 'overweight';
+                    } else {
+                        categoryKey = 'obese';
+                    }
+                    bmiResultCategory.textContent = translations[currentLang][categoryKey];
+                } else {
+                    bmiResultValue.textContent = '0';
+                    bmiResultCategory.textContent = '';
+                }
+            }
+
+            measurementTypeSelect.addEventListener('change', handleMeasurementTypeChange);
+            [bmiWeightInput, bmiHeightInput].forEach(el => el.addEventListener('input', calculateBMI));
+            fromUnitAmountInput.addEventListener('input', convertUnits);
+            fromUnitSelect.addEventListener('change', convertUnits);
+            toUnitSelect.addEventListener('change', convertUnits);
+            swapUnitsBtn.addEventListener('click', () => { [fromUnitSelect.value, toUnitSelect.value] = [toUnitSelect.value, fromUnitSelect.value]; convertUnits(); });
+
+            // --- FINANCIAL CALCULATORS LOGIC ---
+            const loanAmountInput = document.getElementById('loan-amount');
+            const loanDurationInput = document.getElementById('loan-duration');
+            const loanDurationUnitSelect = document.getElementById('loan-duration-unit');
+            const loanInterestInput = document.getElementById('loan-interest');
+            const monthlyPaymentDiv = document.getElementById('monthly-payment');
+            const totalPaymentDiv = document.getElementById('total-payment');
+            const totalInterestDiv = document.getElementById('total-interest');
+            const userTypeRadios = document.querySelectorAll('input[name="user-type"]');
+            const loanSalaryInput = document.getElementById('loan-salary');
+            const loanCommitmentsInput = document.getElementById('loan-commitments');
+            const loanApprovalResults = document.getElementById('loan-approval-results');
+            const loanRejectionMessage = document.getElementById('loan-rejection-message');
+            
+            const taxAmountInput = document.getElementById('tax-amount');
+            const taxRateInput = document.getElementById('tax-rate');
+            const taxValueDiv = document.getElementById('tax-value');
+            const totalWithTaxDiv = document.getElementById('total-with-tax');
+
+            function calculateLoan() {
+                const P = parseFloat(loanAmountInput.value) || 0;
+                const duration = parseFloat(loanDurationInput.value) || 0;
+                const annualInterestRate = parseFloat(loanInterestInput.value) || 0;
+                const durationUnit = loanDurationUnitSelect.value;
+                const userType = document.querySelector('input[name="user-type"]:checked').value;
+                const salary = parseFloat(loanSalaryInput.value) || 0;
+                const commitments = parseFloat(loanCommitmentsInput.value) || 0;
+                
+                if (P <= 0 || duration <= 0 || annualInterestRate < 0 || salary <= 0) {
+                    monthlyPaymentDiv.textContent = '0';
+                    totalPaymentDiv.textContent = '0';
+                    totalInterestDiv.textContent = '0';
+                    loanApprovalResults.classList.remove('hidden');
+                    loanRejectionMessage.classList.add('hidden');
+                    return;
+                }
+
+                const n = durationUnit === 'years' ? duration * 12 : duration;
+                const i = (annualInterestRate / 100) / 12;
+
+                const M = i > 0 ? (P * (i * Math.pow(1 + i, n)) / (Math.pow(1 + i, n) - 1)) : P / n;
+
+                const DBR_LIMIT = userType === 'employee' ? 0.45 : 0.30;
+                const availableForLoan = (salary * DBR_LIMIT) - commitments;
+
+                if (M > availableForLoan) {
+                    loanApprovalResults.classList.add('hidden');
+                    loanRejectionMessage.classList.remove('hidden');
+                } else {
+                    loanApprovalResults.classList.remove('hidden');
+                    loanRejectionMessage.classList.add('hidden');
+                    const totalPayment = M * n;
+                    const totalInterest = totalPayment - P;
+                    monthlyPaymentDiv.textContent = M.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+                    totalInterestDiv.textContent = totalInterest.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+                    totalPaymentDiv.textContent = totalPayment.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+                }
+            }
+
+            function calculateTax() {
+                const amount = parseFloat(taxAmountInput.value) || 0;
+                const rate = parseFloat(taxRateInput.value) || 0;
+                
+                if (amount <= 0 || rate < 0) {
+                    taxValueDiv.textContent = '0';
+                    totalWithTaxDiv.textContent = '0';
+                    return;
+                }
+
+                const tax = amount * (rate / 100);
+                const total = amount + tax;
+
+                taxValueDiv.textContent = tax.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+                totalWithTaxDiv.textContent = total.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+            }
+
+            [loanAmountInput, loanDurationInput, loanDurationUnitSelect, loanInterestInput, loanSalaryInput, loanCommitmentsInput].forEach(el => el.addEventListener('input', calculateLoan));
+            userTypeRadios.forEach(radio => radio.addEventListener('change', calculateLoan));
+            [taxAmountInput, taxRateInput].forEach(el => el.addEventListener('input', calculateTax));
+
+
+            // --- LANGUAGE & TRANSLATION LOGIC ---
+            let currentLang = 'ar';
+            const translations = {
+                ar: {
+                    appTitle: "حاسبتي", finance: "مالية", units: "وحدات", age: "العمر", currency: "عملات", calculator: "حاسبة",
+                    historyTitle: "سجل العمليات", clearHistory: "مسح الكل", noHistory: "لا يوجد سجل حتى الآن.",
+                    rateApproximation: "أسعار الصرف هي قيم تقريبية.",
+                    ageTitle: "أدخل تاريخ ميلادك", dayPlaceholder: "اليوم", monthPlaceholder: "الشهر", yearPlaceholder: "السنة",
+                    timeOptional: "الوقت (اختياري)", hourPlaceholder: "الساعة", minutePlaceholder: "الدقيقة", am: "ص", pm: "م",
+                    gregorian: "ميلادي", hijri: "هجري", hijriNote: "* التحويل الهجري هو تحويل حسابي وقد يختلف عن الرؤية الفعلية.",
+                    invalidTimeError: "وقت غير صحيح (1-12 للساعات, 0-59 للدقائق).", invalidGregorianDateError: "تاريخ ميلادي غير صحيح.",
+                    futureDateError: "تاريخ الميلاد لا يمكن أن يكون في المستقبل.", gregorianDate: "تاريخك بالميلادي", hijriDate: "تاريخك بالهجري",
+                    yourAgeIs: "عمرك هو:", years: "سنوات", months: "أشهر", and: "و", days: "أيام", hours: "ساعات", minutes: "دقائق",
+                    length: "الطول", weight: "الوزن", temperature: "درجة الحرارة", bmi: "كتلة الجسم",
+                    loanTitle: "حاسبة القروض", loanAmount: "مبلغ القرض", loanDuration: "مدة القرض", loanInterest: "نسبة الفائدة السنوية (%)",
+                    monthlyPayment: "القسط الشهري", totalPayment: "إجمالي المبلغ", totalInterest: "مبلغ الفائدة",
+                    taxTitle: "حاسبة الضرائب", preTaxAmount: "المبلغ (بدون ضريبة)", taxRate: "نسبة الضريبة (%)", taxValue: "مبلغ الضريبة", totalWithTax: "الإجمالي مع الضريبة", taxRatePlaceholder: "%",
+                    reuseModalTitle: "إعادة استخدام العملية", useResult: "استخدام النتيجة", editExpression: "تعديل العملية", cancel: "إلغاء",
+                    userType: "نوع المستخدم", employee: "موظف", retired: "متقاعد", salary: "الراتب الشهري", commitments: "الالتزامات الشهرية", rejectionMessage: "عذراً، مبلغ القسط يتجاوز النسبة المسموح بها من راتبك.",
+                    bmiTitle: "حاسبة كتلة الجسم", weightKg: "الوزن (كجم)", heightCm: "الطول (سم)", yourBmiIs: "مؤشر كتلة الجسم", underweight: "نقص الوزن", normalWeight: "وزن طبيعي", overweight: "وزن زائد", obese: "سمنة",
+                    currencyNames: { "USD": "دولار أمريكي", "EUR": "يورو", "GBP": "جنيه استرليني", "CAD": "دولار كندي", "JPY": "ين ياباني", "CNY": "يوان صيني", "KRW": "وون كوري جنوبي", "SAR": "ريال سعودي", "AED": "درهم إماراتي", "QAR": "ريال قطري", "KWD": "دينار كويتي", "OMR": "ريال عماني" },
+                    unitNames: { length: { 'meter': 'متر', 'kilometer': 'كيلومتر', 'centimeter': 'سنتيمتر', 'millimeter': 'مليمتر', 'mile': 'ميل', 'yard': 'ياردة', 'foot': 'قدم', 'inch': 'بوصة' }, weight: { 'gram': 'جرام', 'kilogram': 'كيلوجرام', 'milligram': 'مليجرام', 'tonne': 'طن', 'pound': 'رطل', 'ounce': 'أونصة' }, temperature: { 'celsius': 'مئوية', 'fahrenheit': 'فهرنهايت', 'kelvin': 'كلفن' } }
+                },
+                en: {
+                    appTitle: "My Calculator", finance: "Finance", units: "Units", age: "Age", currency: "Currency", calculator: "Calculator",
+                    historyTitle: "History", clearHistory: "Clear All", noHistory: "No history yet.",
+                    rateApproximation: "Exchange rates are approximate.",
+                    ageTitle: "Enter Your Birth Date", dayPlaceholder: "DD", monthPlaceholder: "MM", yearPlaceholder: "YYYY",
+                    timeOptional: "Time (Optional)", hourPlaceholder: "Hour", minutePlaceholder: "Minute", am: "AM", pm: "PM",
+                    gregorian: "Gregorian", hijri: "Hijri", hijriNote: "* Hijri conversion is algorithmic and may differ from actual sightings.",
+                    invalidTimeError: "Invalid time (1-12 for hours, 0-59 for minutes).", invalidGregorianDateError: "Invalid Gregorian date.",
+                    futureDateError: "Birth date cannot be in the future.", gregorianDate: "Your Gregorian date is", hijriDate: "Your Hijri date is",
+                    yourAgeIs: "Your age is:", years: "years", months: "months", and: "and", days: "days", hours: "hours", minutes: "minutes",
+                    length: "Length", weight: "Weight", temperature: "Temperature", bmi: "BMI",
+                    loanTitle: "Loan Calculator", loanAmount: "Loan Amount", loanDuration: "Loan Duration", loanInterest: "Annual Interest Rate (%)",
+                    monthlyPayment: "Monthly Payment", totalPayment: "Total Payment", totalInterest: "Total Interest",
+                    taxTitle: "Tax Calculator", preTaxAmount: "Amount (pre-tax)", taxRate: "Tax Rate (%)", taxValue: "Tax Amount", totalWithTax: "Total with Tax", taxRatePlaceholder: "%",
+                    reuseModalTitle: "Reuse Calculation", useResult: "Use Result", editExpression: "Edit Expression", cancel: "Cancel",
+                    userType: "User Type", employee: "Employee", retired: "Retired", salary: "Monthly Salary", commitments: "Monthly Commitments", rejectionMessage: "Sorry, the monthly payment exceeds the allowed percentage of your salary.",
+                    bmiTitle: "BMI Calculator", weightKg: "Weight (kg)", heightCm: "Height (cm)", yourBmiIs: "Your BMI", underweight: "Underweight", normalWeight: "Normal weight", overweight: "Overweight", obese: "Obese",
+                    currencyNames: { "USD": "US Dollar", "EUR": "Euro", "GBP": "British Pound", "CAD": "Canadian Dollar", "JPY": "Japanese Yen", "CNY": "Chinese Yuan", "KRW": "South Korean Won", "SAR": "Saudi Riyal", "AED": "UAE Dirham", "QAR": "Qatari Riyal", "KWD": "Kuwaiti Dinar", "OMR": "Omani Rial" },
+                    unitNames: { length: { 'meter': 'Meter', 'kilometer': 'Kilometer', 'centimeter': 'Centimeter', 'millimeter': 'Millimeter', 'mile': 'Mile', 'yard': 'Yard', 'foot': 'Foot', 'inch': 'Inch' }, weight: { 'gram': 'Gram', 'kilogram': 'Kilogram', 'milligram': 'Milligram', 'tonne': 'Tonne', 'pound': 'Pound', 'ounce': 'Ounce' }, temperature: { 'celsius': 'Celsius', 'fahrenheit': 'Fahrenheit', 'kelvin': 'Kelvin' } }
+                }
+            };
+
+            function setLanguage(lang) {
+                currentLang = lang;
+                document.documentElement.lang = lang;
+                document.documentElement.dir = lang === 'ar' ? 'rtl' : 'ltr';
+                
+                document.querySelectorAll('[data-i18n-key]').forEach(el => {
+                    const key = el.dataset.i18nKey;
+                    if (translations[lang][key]) {
+                        el.textContent = translations[lang][key];
+                    }
+                });
+
+                document.querySelectorAll('[data-i18n-placeholder]').forEach(el => {
+                    const key = el.dataset.i18nPlaceholder;
+                     if (translations[lang][key]) {
+                        el.placeholder = translations[lang][key];
+                    }
+                });
+                
+                langSwitchBtn.textContent = lang === 'ar' ? 'EN' : 'ع';
+                
+                // Refresh dynamic content
+                populateCurrencyOptions();
+                convertCurrency();
+                handleMeasurementTypeChange();
+                renderHistory();
+                updateAgeCalculation();
+            }
+
+            langSwitchBtn.addEventListener('click', () => {
+                const newLang = currentLang === 'ar' ? 'en' : 'ar';
+                localStorage.setItem('calculatorLang', newLang);
+                setLanguage(newLang);
+            });
+
+
+            // --- INITIALIZATION ---
+            function initialize() {
+                const splashScreen = document.getElementById('splash-screen');
+                const mainContent = document.getElementById('main-content');
+
+                setTimeout(() => {
+                    splashScreen.classList.add('hidden');
+                    mainContent.style.opacity = '1';
+                }, 2500); // splash screen duration
+
+                document.querySelectorAll('.btn, .btn-num').forEach(btn => { btn.classList.add('h-16', 'rounded-2xl', 'focus:outline-none', 'focus:ring-2', 'focus:ring-indigo-400', 'transition-transform', 'duration-100', 'active:scale-95', 'font-semibold'); });
+                document.querySelectorAll('.btn-num').forEach(btn => { btn.classList.add('bg-gray-200', 'dark:bg-gray-700', 'text-gray-800', 'dark:text-white'); });
+                
+                const savedLang = localStorage.getItem('calculatorLang') || 'ar';
+                setLanguage(savedLang);
+                
+                calculateLoan();
+                calculateTax();
+                renderHistory();
+                updateDisplays();
+                switchMode('calculator');
+            }
+            
+            initialize();
+        });
+    </script>
+</body>
+</html>
+
