@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl" class="dark">
 <head>
-    <head><meta name="verifywebsiteownership" content="IHMNhtxKukvFSclvLDIYpbVbe"/></head>
+    <meta name="verifywebsiteownership" content="IHMNhtxKukvFSclvLDIYpbVbe"/>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>All-in-one calc</title>
@@ -189,7 +189,7 @@
 
     <!-- Splash Screen -->
     <div id="splash-screen" class="fixed inset-0 flex flex-col items-center justify-center">
-        <img src="App.logo.jpg" src="https://storage.googleapis.com/gemini-prod/images/App.logo.jpg" alt="App Logo" class="w-48 h-48 mb-4 rounded-3xl">
+        <img src="https://storage.googleapis.com/gemini-prod/images/App.logo.jpg" alt="App Logo" class="w-48 h-48 mb-4 rounded-3xl" id="splash-logo">
         <h1 id="splash-text" class="text-3xl font-bold text-white tracking-wider">All-in-one calc</h1>
     </div>
 
@@ -290,7 +290,7 @@
                 <button data-key="1" class="btn-num">1</button>
                 <button data-key="2" class="btn-num">2</button>
                 <button data-key="3" class="btn-num">3</button>
-                <button data-key="operator" class="btn bg-orange-400 dark:bg-orange-600 text-white font-bold text-xl">−</button>
+                <button data-key="operator" class="btn bg-orange-400 dark:bg-orange-600 text-white font-bold text-xl">-</button>
                 <button data-key="0" class="btn-num col-span-2">0</button>
                 <button data-key="." class="btn-num">.</button>
                 <button data-key="operator" class="btn bg-orange-400 dark:bg-orange-600 text-white font-bold text-xl">+</button>
@@ -614,8 +614,72 @@
             let selectedHistoryItem = null;
 
             function updateDisplays() { history.textContent = expression || ' '; calculateLiveResult(); }
-            function calculateLiveResult() { try { if (expression.trim() === '') { display.textContent = '0'; return; } let evalExpression = expression.replace(/×/g, '*').replace(/÷/g, '/').replace(/%/g, '/100*').trim(); if (['*', '/', '+', '-'].includes(evalExpression.slice(-1))) { evalExpression = evalExpression.slice(0, -1); } const result = eval(evalExpression); if (typeof result === 'number' && isFinite(result)) { display.textContent = result; } } catch (e) { /* Do nothing */ } }
-            buttons.addEventListener('click', (event) => { if (!event.target.matches('button')) return; const key = event.target.dataset.key; const value = event.target.textContent; if (key.match(/\d/) || key === 'paren' || key === 'percent') { expression += value; } else if (key === '.') { const segments = expression.split(/[+\-×÷()]/); if (!segments[segments.length - 1].includes('.')) { expression += value; } } else if (key === 'operator') { const trimmedExpression = expression.trim(); const lastChar = trimmedExpression.slice(-1); if (['+', '-', '×', '÷'].includes(lastChar)) { expression = trimmedExpression.slice(0, -1) + value; } else if (trimmedExpression !== '' && !['('].includes(lastChar)) { expression += value; } else if (value === '-') { expression += value; } } else if (key === 'clear') { expression = ''; } else if (key === 'equals') { try { let finalExpression = expression.replace(/×/g, '*').replace(/÷/g, '/').replace(/%/g, '/100'); const result = eval(finalExpression); if (typeof result !== 'number' || !isFinite(result)) { throw new Error("Invalid calculation"); } const historyEntry = { expression: expression, result: result }; calculationHistory.unshift(historyEntry); if (calculationHistory.length > 15) calculationHistory.pop(); renderHistory(); expression = String(result); history.textContent = ' '; display.textContent = result; return; } catch (error) { display.textContent = 'Error'; expression = ''; } } updateDisplays(); });
+            function calculateLiveResult() { try { if (expression.trim() === '') { display.textContent = '0'; return; } let evalExpression = expression.replace(/×/g, '*').replace(/÷/g, '/').replace(/−/g, '-').replace(/%/g, '/100*').trim(); if (['*', '/', '+', '-'].includes(evalExpression.slice(-1))) { evalExpression = evalExpression.slice(0, -1); } const result = eval(evalExpression); if (typeof result === 'number' && isFinite(result)) { display.textContent = result; } } catch (e) { /* Do nothing */ } }
+            
+            buttons.addEventListener('click', (event) => { 
+                if (!event.target.matches('button')) return; 
+                const key = event.target.dataset.key; 
+                let value = event.target.textContent; 
+                
+                // تحويل إشارة الناقص المطبعية إلى الإشارة البرمجية المعتمدة
+                if (value === '−') value = '-';
+                
+                if (key.match(/\d/) || key === 'paren' || key === 'percent') { 
+                    expression += value; 
+                } else if (key === '.') { 
+                    const segments = expression.split(/[+\-×÷()]/); 
+                    if (!segments[segments.length - 1].includes('.')) { 
+                        expression += value; 
+                    } 
+                } else if (key === 'operator') { 
+                    const trimmedExpression = expression.trim(); 
+                    const lastChar = trimmedExpression.slice(-1); 
+                    
+                    if (value === '-') {
+                        // السماح بإضافة علامة الطرح كإشارة سالبة في البداية أو بعد قوس مفتوح أو بعد الضرب والقسمة
+                        if (trimmedExpression === '' || lastChar === '(' || lastChar === '×' || lastChar === '÷') {
+                            expression += value;
+                        } else if (['+', '-'].includes(lastChar)) {
+                            // استبدال علامة الجمع أو الطرح السابقة
+                            expression = trimmedExpression.slice(0, -1) + value;
+                        } else {
+                            expression += value;
+                        }
+                    } else {
+                        // التعامل مع باقي العمليات (الجمع، الضرب، القسمة)
+                        if (['+', '-', '×', '÷'].includes(lastChar)) {
+                            const secondLastChar = trimmedExpression.slice(-2, -1);
+                            // إذا كانت الإشارة السابقة هي سالب وقبلها ضرب أو قسمة، يتم استبدال الإشارتين معاً
+                            if (lastChar === '-' && ['×', '÷'].includes(secondLastChar)) {
+                                expression = trimmedExpression.slice(0, -2) + value;
+                            } else {
+                                expression = trimmedExpression.slice(0, -1) + value;
+                            }
+                        } else if (trimmedExpression !== '' && lastChar !== '(') {
+                            expression += value;
+                        }
+                    }
+                } else if (key === 'clear') { 
+                    expression = ''; 
+                } else if (key === 'equals') { 
+                    try { 
+                        let finalExpression = expression.replace(/×/g, '*').replace(/÷/g, '/').replace(/−/g, '-').replace(/%/g, '/100'); 
+                        const result = eval(finalExpression); 
+                        if (typeof result !== 'number' || !isFinite(result)) { throw new Error("Invalid calculation"); } 
+                        const historyEntry = { expression: expression, result: result }; 
+                        calculationHistory.unshift(historyEntry); 
+                        if (calculationHistory.length > 15) calculationHistory.pop(); 
+                        renderHistory(); 
+                        expression = String(result); 
+                        history.textContent = ' '; 
+                        display.textContent = result; 
+                        return; 
+                    } catch (error) { 
+                        display.textContent = 'Error'; expression = ''; 
+                    } 
+                } 
+                updateDisplays(); 
+            });
 
             function renderHistory() {
                 historyList.innerHTML = '';
@@ -1030,6 +1094,3 @@
     </script>
 </body>
 </html>
-
-
-
